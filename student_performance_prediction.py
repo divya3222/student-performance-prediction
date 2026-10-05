@@ -1,6 +1,6 @@
 """
 Student Performance Prediction using Machine Learning
-Dataset: student-por(1).csv
+Dataset: student-por.csv
 Project: Data Science Master Virtual Internship
 
 The dataset contains 649 Portuguese-student records and 33 columns.
@@ -8,7 +8,7 @@ Target for regression: G3 (final grade, 0-20)
 Target for classification: At_Risk = 1 when G3 < 10
 
 Run in Google Colab/Jupyter:
-    1. Upload student-por(1).csv
+    1. Upload student-por.csv
     2. Run this script/cells.
 """
 
@@ -40,7 +40,7 @@ from sklearn.metrics import (
 # ============================================================
 # 1. LOAD DATASET
 # ============================================================
-FILE_PATH = "student-por(1).csv"
+FILE_PATH = "student-por.csv"
 
 df = pd.read_csv(FILE_PATH)
 
@@ -77,7 +77,7 @@ print(df["G3"].value_counts().sort_index())
 
 # Final grade distribution
 plt.figure(figsize=(8, 5))
-sns.histplot(df["G3"], bins=20, kde=True)
+plt.hist(df["G3"], bins=20, edgecolor="black")
 plt.title("Distribution of Final Student Grades (G3)")
 plt.xlabel("Final Grade")
 plt.ylabel("Number of Students")
@@ -86,7 +86,8 @@ plt.show()
 
 # Study time vs final grade
 plt.figure(figsize=(7, 5))
-sns.boxplot(x="studytime", y="G3", data=df)
+groups = [df.loc[df["studytime"] == level, "G3"] for level in sorted(df["studytime"].unique())]
+plt.boxplot(groups, labels=sorted(df["studytime"].unique()))
 plt.title("Study Time vs Final Grade")
 plt.xlabel("Study Time")
 plt.ylabel("Final Grade (G3)")
@@ -95,7 +96,7 @@ plt.show()
 
 # Absences vs final grade
 plt.figure(figsize=(8, 5))
-sns.scatterplot(x="absences", y="G3", data=df)
+plt.scatter(df["absences"], df["G3"], alpha=0.7)
 plt.title("Absences vs Final Grade")
 plt.xlabel("Number of Absences")
 plt.ylabel("Final Grade (G3)")
@@ -104,7 +105,7 @@ plt.show()
 
 # Previous grades vs final grade
 plt.figure(figsize=(7, 5))
-sns.scatterplot(x="G2", y="G3", data=df)
+plt.scatter(df["G2"], df["G3"], alpha=0.7)
 plt.title("Previous Grade (G2) vs Final Grade (G3)")
 plt.xlabel("G2 - Second Period Grade")
 plt.ylabel("G3 - Final Grade")
@@ -396,11 +397,10 @@ print("\nTop 15 features:")
 print(importance_df.head(15))
 
 plt.figure(figsize=(9, 6))
-sns.barplot(
-    data=importance_df.head(15),
-    x="Importance",
-    y="Feature"
-)
+top_features = importance_df.head(15).sort_values("Importance")
+plt.barh(top_features["Feature"], top_features["Importance"])
+plt.xlabel("Importance")
+plt.ylabel("Feature")
 plt.title("Top 15 Features - Random Forest")
 plt.tight_layout()
 plt.show()
